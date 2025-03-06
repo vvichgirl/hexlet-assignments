@@ -35,7 +35,7 @@ public class FileKV implements KeyValueStorage {
     public Map<String, String> toMap() {
         var data = Utils.readFile(filePath);
         var dataMap = Utils.deserialize(data);
-        return new HashMap<>(dataMap);
+        return dataMap;
     }
 }
 // END
