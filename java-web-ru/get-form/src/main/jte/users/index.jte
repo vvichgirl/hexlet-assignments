@@ -6,7 +6,7 @@
         <form action="/users" method="get">
           <div class="mb-3">
             <label for="term" class="form-label">Имя пользователя:</label>
-            <input type="search" class="form-control" id="term" name="term" value="${page.getTerm()}" required>
+            <input type="search" class="form-control" id="term" name="term" value="${page.getTerm()}">
           </div>
           <button type="submit" class="btn btn-primary">Поиск</button>
         </form>
