@@ -70,17 +70,19 @@ public class PostsController {
         var id = ctx.pathParamAsClass("id", Long.class).get();
         var post = PostRepository.find(id)
                 .orElseThrow(() -> new NotFoundResponse("Post not found"));
+        String name = ctx.formParam("name").trim();
+        String body = ctx.formParam("body").trim();
+        post.setName(name);
+        post.setBody(body);
         try {
-            var name = ctx.formParamAsClass("name", String.class)
+            String nameV = ctx.formParamAsClass("name", String.class)
                     .check(value -> value.length() >= 2, "Название не должно быть короче двух символов")
                     .get();
 
-            var body = ctx.formParamAsClass("body", String.class)
+            String bodyV = ctx.formParamAsClass("body", String.class)
                     .check(value -> value.length() >= 10, "Пост должен быть не короче 10 символов")
                     .get();
 
-            post.setName(name);
-            post.setBody(body);
             PostRepository.save(post);
             ctx.redirect(NamedRoutes.postsPath());
 
