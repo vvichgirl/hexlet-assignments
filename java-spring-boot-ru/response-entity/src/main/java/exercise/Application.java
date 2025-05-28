@@ -43,8 +43,8 @@ public class Application {
     @PostMapping("/posts") // Создание поста
     public ResponseEntity<Post> create(@RequestBody Post post) {
         posts.add(post);
-        return ResponseEntity.status(201)
-                .body(post);
+        URI location = URI.create("/posts/" + post.getId());
+        return ResponseEntity.created(location).body(post);
     }
 
     @GetMapping("/posts/{id}") // Вывод поста
