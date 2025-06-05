@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 import exercise.model.Post;
-import exercise.model.Comment;
 import exercise.repository.PostRepository;
 import exercise.exception.ResourceNotFoundException;
 import exercise.dto.PostDTO;
@@ -30,15 +29,7 @@ public class PostsController {
     public List<PostDTO> index() {
         var posts = postRepository.findAll();
         var result = posts.stream()
-                .map(post -> {
-                    var postDTO = postToDTO(post);
-                    var comments = commentRepository.findByPostId(post.getId());
-                    var commentsDTO = comments.stream()
-                            .map(this::commentToDTO)
-                            .toList();
-                    postDTO.setComments(commentsDTO);
-                    return postDTO;
-                })
+                .map(this::toPostDTO)
                 .toList();
         return result;
     }
@@ -49,30 +40,28 @@ public class PostsController {
         var post =  postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post with id " + id + " not found"));
 
-        var postDTO = postToDTO(post);
-
-        var comments = commentRepository.findByPostId(post.getId());
-        var commentsDTO = comments.stream()
-                .map(this::commentToDTO)
-                .toList();
-        postDTO.setComments(commentsDTO);
-
-        return postDTO;
+        return toPostDTO(post);
     }
 
-    private PostDTO postToDTO(Post post) {
+    private PostDTO toPostDTO(Post post) {
         var dto = new PostDTO();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
         dto.setBody(post.getBody());
+
+        var comments = commentRepository.findByPostId(post.getId());
+        var commentsDTO = comments.stream()
+                .map(comment -> {
+                    var commentDto = new CommentDTO();
+                    commentDto.setId(comment.getId());
+                    commentDto.setBody(comment.getBody());
+                    return commentDto;
+                })
+                .toList();
+        dto.setComments(commentsDTO);
+
         return dto;
     }
 
-    private CommentDTO commentToDTO(Comment comment) {
-        var dto = new CommentDTO();
-        dto.setId(comment.getId());
-        dto.setBody(comment.getBody());
-        return dto;
-    }
 }
 // END
