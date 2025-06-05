@@ -65,7 +65,7 @@ class TaskControllerTest {
 
     // BEGIN
 
-    private Task nesTask() {
+    private Task generateTask() {
         Task task = Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
                 .supply(Select.field(Task::getTitle), () -> faker.lorem().word())
@@ -77,54 +77,63 @@ class TaskControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var task = nesTask();
+        var taskTest = generateTask();
 
         var request = post("/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(task));
+                .content(om.writeValueAsString(taskTest));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
+
+        var task = taskRepository.findByTitle(taskTest.getTitle()).get();
+
+        assertThat(task).isNotNull();
+        assertThat(task.getTitle()).isEqualTo(taskTest.getTitle());
+        assertThat(task.getDescription()).isEqualTo(taskTest.getDescription());
     }
 
     @Test
     public void testShow() throws Exception {
-        var task = nesTask();
+        var taskTest = generateTask();
 
-        var result = mockMvc.perform(get("/tasks/{id}", task.getId()))
+        var result = mockMvc.perform(get("/tasks/{id}", taskTest.getId()))
                 .andExpect(status().isOk())
                 .andReturn();
 
         var body = result.getResponse().getContentAsString();
-        assertThat(body).contains(task.getTitle());
+        assertThatJson(body).and(
+                v -> v.node("title").isEqualTo(taskTest.getTitle()),
+                v -> v.node("description").isEqualTo(taskTest.getDescription())
+        );
     }
 
     @Test
     public void testUpdate() throws Exception {
-        var task = nesTask();
+        var taskTest = generateTask();
 
         var data = new HashMap<>();
         data.put("title", "Title Test");
 
-        var request = put("/tasks/" + task.getId())
+        var request = put("/tasks/" + taskTest.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-        task = taskRepository.findById(task.getId()).get();
-        assertThat(task.getTitle()).isEqualTo(("Title Test"));
+        taskTest = taskRepository.findById(taskTest.getId()).get();
+        assertThat(taskTest.getTitle()).isEqualTo(data.get("title"));
     }
 
     @Test
     public void testDelete() throws Exception {
-        var task = nesTask();
+        var taskTest = generateTask();
 
-        mockMvc.perform(delete("/tasks/{id}", task.getId()))
+        mockMvc.perform(delete("/tasks/{id}", taskTest.getId()))
                 .andExpect(status().isOk());
 
-        assertThat(taskRepository.findById(task.getId())).isEmpty();
+        assertThat(taskRepository.findById(taskTest.getId())).isEmpty();
     }
     // END
 }
