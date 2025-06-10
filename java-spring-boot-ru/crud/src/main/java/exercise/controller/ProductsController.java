@@ -58,7 +58,6 @@ public class ProductsController {
         var product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " not found"));
         var productDTO = productMapper.map(product);
-        productDTO.setCategoryName(product.getCategory().getName());
         return productDTO;
     }
 
