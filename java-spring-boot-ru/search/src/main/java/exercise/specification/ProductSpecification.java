@@ -18,23 +18,33 @@ public class ProductSpecification {
     }
 
     private Specification<Product> withCategoryId(Long categoryId) {
-        return (root, query, cb) -> categoryId == null ? cb.conjunction() : cb.equal(root.get("category").get("id"), categoryId);
+        return (root, query, cb) -> categoryId == null
+                ? cb.conjunction()
+                : cb.equal(root.get("category").get("id"), categoryId);
     }
 
     private Specification<Product> withRatingGt(Double rating) {
-        return (root, query, cb) -> rating == null ? cb.conjunction() : cb.greaterThan(root.get("rating"), rating);
+        return (root, query, cb) -> rating == null
+                ? cb.conjunction()
+                : cb.greaterThan(root.get("rating"), rating);
     }
 
     private Specification<Product> withPriceLt(Integer price) {
-        return (root, query, cb) -> price == null ? cb.conjunction() : cb.lessThan(root.get("price"), price);
+        return (root, query, cb) -> price == null
+                ? cb.conjunction()
+                : cb.lessThan(root.get("price"), price);
     }
 
     private Specification<Product> withPriceGt(Integer price) {
-        return (root, query, cb) -> price == null ? cb.conjunction() : cb.greaterThan(root.get("price"), price);
+        return (root, query, cb) -> price == null
+                ? cb.conjunction()
+                : cb.greaterThan(root.get("price"), price);
     }
 
     private Specification<Product> withTitleCont(String title) {
-        return (root, query, cb) -> title == null ? cb.conjunction() : cb.like(root.get("title"), title.toLowerCase());
+        return (root, query, cb) -> title == null
+                ? cb.conjunction()
+                : cb.like(cb.lower(root.get("title")), "%" + title + "%");
     }
 }
 // END
