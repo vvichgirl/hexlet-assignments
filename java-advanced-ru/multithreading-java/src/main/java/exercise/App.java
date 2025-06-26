@@ -11,8 +11,8 @@ class App {
         MaxThread maxThread = new MaxThread(numbers);
         MinThread minThread = new MinThread(numbers);
 
-        minThread.start();
-        maxThread.start();
+        minThread.run();
+        maxThread.run();
 
         int min = minThread.getMin();
         int max = maxThread.getMax();
